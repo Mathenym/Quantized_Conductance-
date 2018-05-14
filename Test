@@ -1,0 +1,100 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 14 14:01:34 2018
+
+@author: Mitch
+"""
+
+import traceback
+from datetime import datetime
+
+import matplotlib.pyplot as plt
+#import matplotlib.animation as animation
+#import numpy as np
+from drawnow import drawnow
+#from IPython import get_ipython
+from multiprocessing import Process
+from pyqtgraph.Qt import QtGui, QtCore
+import pyqtgraph as pg
+import random
+'''
+Import and open LabJack U3 package
+'''
+import u3
+d=u3.U3() #open
+
+'''
+Set all channels to analog
+'''
+d.configIO(FIOAnalog = 31)
+
+'''
+Number of packets to be read.
+'''
+Max_Requests = 100
+
+'''
+Get calibration data
+'''
+d.getCalibrationData()
+
+'''
+Set the stream parameters: 1 channel, positive channel #0,
+negative channel #31 ==single ended, resolutaion 3 == faster but higher noise.
+Sample rate = scanrate * numchannels, max 50k samples/s.
+Samples per packet = 25 for data tranfer efficiency
+'''
+packetsPerRequest = 50
+print('Configuring U3 Stream...')
+d.streamConfig(NumChannels=1,PChannels=[0],NChannels=[31],Resolution=1,\
+               ScanFrequency=10000,SamplesPerPacket=25)
+
+'''
+Use "try" to prevent program crash with errors.
+'''
+
+d.streamStart()
+rawDataList = []
+runTimeList = []
+start = datetime.now()
+print('Started stream at ',datetime.now(),'\n') #print the scan start time
+
+'''
+Initialize Counters
+'''
+missed = 0
+dataCount = 0
+packetCount = 0
+
+''' Try Live plotting data'''
+
+app = QtGui.QApplication([])
+p = pg.plot()
+curve = p.plot()
+data = []
+
+for r in d.streamData():    
+    def updater():
+        data.append(rawDataList)
+        curve.setData(data)
+    
+    
+    
+    
+timer = QtCore.QTimer()
+timer.timeout.connect(updater)
+timer.start(0)
+
+
+d.streamStop()
+stop = datetime.now()
+print('\n','Stream stopped at ',datetime.now(),'\n')
+'''close u3'''
+d.close()
+
+if __name__ == '__main__':
+    import sys
+    if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+        QtGui.QApplication.instance().exec_()    
+    
