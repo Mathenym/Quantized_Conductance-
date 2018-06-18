@@ -1,5 +1,22 @@
-I have been able to read in and live plot data from labjack U3. 
+Files Temp_GUI.py and Temp_GUI1.py successfully read in temperature data from labjack U3. 
 
-I have made a simple GUI that plots when "Start Plotting" is pushed. 
+The buttons on the GUI Do as follows: 
 
-Added button to stop plotting. It closes lab jack, but the program starts to freak out in background. 
+Start: Starts reading and plotting temperature data. 
+
+Stop: Stops the plot. 
+
+Clear: clears data, which allows to restart the plotting without needed to close the interface. 
+
+To Do: 
+
+Need to add axis titles.
+
+Figure out x axis scale and change it to time. 
+
+Add menu system so that one can save the plot. 
+
+Maybe figure out how to add fitting (long term) 
+
+
+
